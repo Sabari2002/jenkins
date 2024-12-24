@@ -5,7 +5,7 @@ pipeline {
         stage('Clone Repository') {
             steps {
                 echo 'Cloning the repository...'
-                git branch: 'main', url: 'https://github.com/your-username/your-python-repo.git'
+                git branch: 'main', url: 'https://github.com/Sabari2002/jenkins'
             }
         }
         stage('Install Dependencies') {
