@@ -8,10 +8,12 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/Sabari2002/jenkins'
             }
         }
-        stage('Create Virtual Environment') {
+        stage('Install pipx and Virtual Environment') {
             steps {
-                echo 'Creating virtual environment...'
-                sh 'python3 -m venv venv'
+                echo 'Installing pipx and creating virtual environment...'
+                sh 'pip install --user pipx && pipx ensurepath'
+                sh 'pipx install python3.11'
+                sh 'pipx run python3 -m venv venv'
             }
         }
         stage('Install Dependencies') {
