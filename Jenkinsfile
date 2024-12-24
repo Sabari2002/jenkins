@@ -5,19 +5,27 @@ pipeline {
         stage('Clone Repository') {
             steps {
                 echo 'Cloning the repository...'
-                git branch: 'main', url: 'https://github.com/Sabari2002/jenkins'
+                git branch: 'main', url: 'https://github.com/Sabari2002/jenkins.git'
             }
         }
         stage('Install Dependencies') {
             steps {
                 echo 'Installing dependencies...'
-                sh 'pip install -r requirements.txt'
+                sh '''
+                python3 -m venv venv  # Create a virtual environment
+                source venv/bin/activate  # Activate the virtual environment
+                pip install --upgrade pip  # Upgrade pip
+                pip install -r requirements.txt  # Install dependencies
+                '''
             }
         }
         stage('Run Tests') {
             steps {
                 echo 'Running tests...'
-                sh 'pytest --junitxml=results.xml'
+                sh '''
+                source venv/bin/activate  # Activate the virtual environment
+                pytest --junitxml=results.xml  # Run tests
+                '''
             }
         }
         stage('Publish Test Results') {
