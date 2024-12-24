@@ -10,8 +10,11 @@ pipeline {
         }
         stage('Install Dependencies') {
             steps {
-                echo 'Creating virtual environment and installing dependencies...'
+                echo 'Installing python3-venv and creating virtual environment...'
                 script {
+                    // Install python3-venv if it's not installed
+                    sh 'sudo apt-get update && sudo apt-get install -y python3.11-venv'
+                    
                     // Create a virtual environment
                     sh 'python3 -m venv venv'
 
@@ -40,13 +43,13 @@ pipeline {
     post {
         always {
             echo 'Cleaning up workspace...'
-            cleanWs() // Clean up workspace after each run
+            cleanWs()
         }
         success {
-            echo 'Pipeline completed successfully.' // Message on successful completion
+            echo 'Pipeline completed successfully.'
         }
         failure {
-            echo 'Pipeline failed.' // Message if the pipeline fails
+            echo 'Pipeline failed.'
         }
     }
 }
