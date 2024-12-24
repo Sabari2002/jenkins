@@ -1,5 +1,7 @@
 pipeline {
-    agent any
+    agent {
+        docker { image 'python:3.11' }  // Using the official Python 3.11 Docker image
+    }
 
     stages {
         stage('Clone Repository') {
@@ -8,12 +10,10 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/Sabari2002/jenkins'
             }
         }
-        stage('Install pipx and Virtual Environment') {
+        stage('Create Virtual Environment') {
             steps {
-                echo 'Installing pipx and creating virtual environment...'
-                sh 'pip install --user pipx && pipx ensurepath'
-                sh 'pipx install python3.11'
-                sh 'pipx run python3 -m venv venv'
+                echo 'Creating virtual environment...'
+                sh 'python3 -m venv venv'
             }
         }
         stage('Install Dependencies') {
