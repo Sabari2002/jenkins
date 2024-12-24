@@ -1,7 +1,5 @@
 pipeline {
-    agent {
-        docker { image 'python:3.11' }  // Using the official Python 3.11 Docker image
-    }
+    agent any  // This will run the pipeline on any available agent
 
     stages {
         stage('Clone Repository') {
@@ -13,19 +11,31 @@ pipeline {
         stage('Create Virtual Environment') {
             steps {
                 echo 'Creating virtual environment...'
-                sh 'python3 -m venv venv'
+                script {
+                    docker.image('python:3.11').inside {
+                        sh 'python3 -m venv venv'
+                    }
+                }
             }
         }
         stage('Install Dependencies') {
             steps {
                 echo 'Installing dependencies...'
-                sh '. venv/bin/activate && pip install --upgrade pip && pip install -r requirements.txt'
+                script {
+                    docker.image('python:3.11').inside {
+                        sh '. venv/bin/activate && pip install --upgrade pip && pip install -r requirements.txt'
+                    }
+                }
             }
         }
         stage('Run Tests') {
             steps {
                 echo 'Running tests...'
-                sh '. venv/bin/activate && pytest --junitxml=results.xml'
+                script {
+                    docker.image('python:3.11').inside {
+                        sh '. venv/bin/activate && pytest --junitxml=results.xml'
+                    }
+                }
             }
         }
         stage('Publish Test Results') {
