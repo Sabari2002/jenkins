@@ -1,25 +1,23 @@
 pipeline {
-    agent {
-        docker { image 'python:3.11' }
-    }
+    agent any
 
     stages {
         stage('Clone Repository') {
             steps {
                 echo 'Cloning the repository...'
-                git branch: 'main', url: 'https://github.com/Sabari2002/jenkins'
+                git branch: 'main', url: 'https://github.com/your-username/your-python-repo.git'
             }
         }
         stage('Install Dependencies') {
             steps {
                 echo 'Installing dependencies...'
-                sh 'python3 -m venv venv && . venv/bin/activate && pip install -r requirements.txt'
+                sh 'pip install -r requirements.txt'
             }
         }
         stage('Run Tests') {
             steps {
                 echo 'Running tests...'
-                sh '. venv/bin/activate && pytest --junitxml=results.xml'
+                sh 'pytest --junitxml=results.xml'
             }
         }
         stage('Publish Test Results') {
