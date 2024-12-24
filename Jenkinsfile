@@ -2,35 +2,28 @@ pipeline {
     agent any
 
     stages {
-        stage('Checkout SCM') {
+        stage('Clone Repository') {
             steps {
-                git branch: 'main', url: 'https://github.com/Sabari2002/jenkins'
+                echo 'Cloning the repository...'
+                git branch: 'main', url: 'https://github.com/your-username/your-python-repo.git'
             }
         }
-
-        stage('Create Virtual Environment and Install Dependencies') {
+        stage('Install Dependencies') {
             steps {
-                // Use PowerShell for virtual environment setup and dependency installation
-                powershell '''
-                python -m venv venv
-                .\\venv\\Scripts\\Activate
-                pip install -r requirements.txt
-                '''
+                echo 'Installing dependencies...'
+                sh 'pip install -r requirements.txt'
             }
         }
-
         stage('Run Tests') {
             steps {
-                powershell '''
-                .\\venv\\Scripts\\Activate
-                python -m unittest discover -s tests
-                '''
+                echo 'Running tests...'
+                sh 'pytest --junitxml=results.xml'
             }
         }
-
         stage('Publish Test Results') {
             steps {
-                junit 'test-results/*.xml'
+                echo 'Publishing test results...'
+                junit 'results.xml'
             }
         }
     }
@@ -40,13 +33,11 @@ pipeline {
             echo 'Cleaning up workspace...'
             cleanWs()
         }
-
-        failure {
-            echo 'Pipeline failed.'
-        }
-
         success {
             echo 'Pipeline completed successfully.'
+        }
+        failure {
+            echo 'Pipeline failed.'
         }
     }
 }
