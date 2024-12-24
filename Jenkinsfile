@@ -1,5 +1,10 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'ubuntu:20.04' // A Docker image with sudo and basic tools
+            args '-u root' // Running as root to install dependencies
+        }
+    }
 
     stages {
         stage('Clone Repository') {
@@ -12,9 +17,9 @@ pipeline {
             steps {
                 echo 'Installing python3-venv and creating virtual environment...'
                 script {
-                    // Install python3-venv if it's not installed (without sudo)
+                    // Install python3-venv package
                     sh 'apt-get update && apt-get install -y python3.11-venv'
-                    
+
                     // Create a virtual environment
                     sh 'python3 -m venv venv'
 
