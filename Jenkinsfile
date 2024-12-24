@@ -4,37 +4,33 @@ pipeline {
     stages {
         stage('Checkout SCM') {
             steps {
-                echo 'Checking out the repository...'
-                git url: 'https://github.com/Sabari2002/jenkins', branch: 'main'
+                git branch: 'main', url: 'https://github.com/Sabari2002/jenkins'
             }
         }
 
-        stage('Create Virtual Environment') {
+        stage('Create Virtual Environment and Install Dependencies') {
             steps {
-                echo 'Creating virtual environment...'
-                sh 'python3 -m venv venv'  // Creates a virtual environment
-                sh 'source venv/bin/activate'  // Activates the virtual environment
-            }
-        }
-
-        stage('Install Dependencies') {
-            steps {
-                echo 'Installing dependencies...'
-                sh 'source venv/bin/activate && pip install -r requirements.txt'  // Install dependencies in the virtual environment
+                // Use PowerShell for virtual environment setup and dependency installation
+                powershell '''
+                python -m venv venv
+                .\\venv\\Scripts\\Activate
+                pip install -r requirements.txt
+                '''
             }
         }
 
         stage('Run Tests') {
             steps {
-                echo 'Running tests...'
-                sh 'source venv/bin/activate && pytest --junitxml=results.xml'  // Run tests in the virtual environment
+                powershell '''
+                .\\venv\\Scripts\\Activate
+                python -m unittest discover -s tests
+                '''
             }
         }
 
         stage('Publish Test Results') {
             steps {
-                echo 'Publishing test results...'
-                junit 'results.xml'  // Publish test results
+                junit 'test-results/*.xml'
             }
         }
     }
@@ -42,13 +38,15 @@ pipeline {
     post {
         always {
             echo 'Cleaning up workspace...'
-            cleanWs()  // Clean up the workspace
+            cleanWs()
         }
-        success {
-            echo 'Pipeline completed successfully.'
-        }
+
         failure {
             echo 'Pipeline failed.'
+        }
+
+        success {
+            echo 'Pipeline completed successfully.'
         }
     }
 }
