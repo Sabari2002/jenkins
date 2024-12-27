@@ -1,4 +1,4 @@
-from src.app import add, subtract
+from jenkins.app import add, subtract
 
 def test_add():
     assert add(2, 3) == 5

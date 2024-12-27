@@ -4,40 +4,31 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                echo 'Cloning the repository...'
-                git branch: 'main', url: 'https://github.com/your-username/your-python-repo.git'
+                git branch: 'main', url: 'https://github.com/your-repo/my-python-project.git'
             }
         }
-        stage('Install Dependencies') {
+        stage('Setup Environment') {
             steps {
-                echo 'Installing dependencies...'
-                sh 'pip install -r requirements.txt'
+                sh 'python3 -m venv venv'
+                sh './venv/bin/pip install -r requirements.txt'
             }
         }
         stage('Run Tests') {
             steps {
-                echo 'Running tests...'
-                sh 'pytest --junitxml=results.xml'
+                // Run pytest and generate JUnit-compatible test results
+                sh './venv/bin/pytest --junitxml=test-results.xml'
             }
         }
         stage('Publish Test Results') {
             steps {
-                echo 'Publishing test results...'
-                junit 'results.xml'
+                // Publish the test results to Jenkins
+                junit 'test-results.xml'
             }
         }
-    }
-
-    post {
-        always {
-            echo 'Cleaning up workspace...'
-            cleanWs()
-        }
-        success {
-            echo 'Pipeline completed successfully.'
-        }
-        failure {
-            echo 'Pipeline failed.'
+        stage('Run Application') {
+            steps {
+                sh './venv/bin/python main.py'
+            }
         }
     }
 }
