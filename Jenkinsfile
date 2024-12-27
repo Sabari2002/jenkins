@@ -1,34 +1,53 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'python:3.10-slim'
+            args '--user root'
+        }
+    }
+    
+    environment {
+        PYTHONPATH = '/var/jenkins_home/workspace/my_python_job'
+        APP_PORT = '80'
+    }
 
     stages {
         stage('Clone Repository') {
             steps {
-                git branch: 'main', url: 'https://github.com/your-repo/my-python-project.git'
+                git branch: 'main', url: 'https://github.com/Sabari2002/jenkins.git'
             }
         }
         stage('Setup Environment') {
             steps {
-                sh 'python3 -m venv venv'
-                sh './venv/bin/pip install -r requirements.txt'
+                sh 'pip install -r requirements.txt'
             }
         }
         stage('Run Tests') {
             steps {
-                // Run pytest and generate JUnit-compatible test results
-                sh './venv/bin/pytest --junitxml=test-results.xml'
+                sh 'pytest --junitxml=results.xml' 
             }
         }
-        stage('Publish Test Results') {
+        stage('Build Docker Image') {
             steps {
-                // Publish the test results to Jenkins
-                junit 'test-results.xml'
+                sh '''
+                docker build -t myapp:latest .
+                docker run -d --name myapp_container -p ${APP_PORT}:${APP_PORT} myapp:latest
+                sleep 5
+                curl --fail http://localhost:${APP_PORT} || (echo "App failed to start" && exit 1)
+                '''
             }
         }
-        stage('Run Application') {
-            steps {
-                sh './venv/bin/python main.py'
-            }
+    }
+    post {
+        always {
+            junit '**/results.xml'
+            sh 'docker rm -f myapp_container || true'
+        }
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed. Investigate the logs.'
         }
     }
 }
