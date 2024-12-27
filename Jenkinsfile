@@ -5,7 +5,7 @@ pipeline {
         stage('Clone Repository') {
             steps {
 <<<<<<< HEAD
-                git branch: 'main', url: 'https://github.com/your-repo/my-python-project.git'
+                git branch: 'main', url: 'https://github.com/Sabari2002/jenkins'
 =======
                 echo 'Cloning the repository...'
                 git branch: 'main', url: 'https://github.com/Sabari2002/jenkins'
