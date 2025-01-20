@@ -5,7 +5,6 @@ def subtract(a, b):
     return a - b
 
 if __name__ == "__main__":
-    # Example predefined inputs
     num1 = 10
     num2 = 5
 
